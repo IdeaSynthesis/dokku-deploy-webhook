@@ -23,9 +23,9 @@ invoke_deploy_webhook() {
       local METHOD=$(config_get "$APP" DOKKU_DEPLOY_WEBHOOK_METHOD)
       dokku_log_info1 "Invoking webhook url $url"
       if [[ "POST" == "$METHOD" ]] ; then
-          dokku_log_info1 $(curl -q -m 5 "$url" -X "POST" -H "Content-Type: application/x-www-form-urlencoded" -d "APP=$APP" -d "IP=$IP" -d "PORT=$PORT")          
+          dokku_log_info1 $(curl -s -q -m 5 "$url" -X "POST" -H "Content-Type: application/x-www-form-urlencoded" -d "APP=$APP" -d "IP=$IP" -d "PORT=$PORT")          
       else
-          dokku_log_info1 $(curl -q -m 5 "$url")          
+          dokku_log_info1 $(curl -s -q -m 5 "$url")          
       fi
   fi  
 }
