@@ -6,8 +6,9 @@ deploy-webhook-post-deploy() {
   declare APP="$1"
   declare PORT="$2"
   declare IP="$3"
+  declare IMAGE="$4"
 
-  invoke_deploy_webhook "$APP" "$IP" "$PORT"
+  invoke_deploy_webhook "$APP" "$IP" "$PORT" "$IMAGE"
 }
 
 deploy-webhook-post-deploy "$@"

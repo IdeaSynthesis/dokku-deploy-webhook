@@ -11,6 +11,7 @@ invoke_deploy_webhook() {
   local APP="$1"
   local IP="$2"
   local PORT="$3"
+  local IMAGE="$4"
 
   local WEBHOOK_URL=$(config_get "$APP" DOKKU_DEPLOY_WEBHOOK)
 
@@ -19,6 +20,7 @@ invoke_deploy_webhook() {
       local url=${WEBHOOK_URL//\$\{IP_ADDRESS\}/${IP}}:
       url=${url//\$\{APP\}/${APP}}
       url=${url//\$\{PORT\}/${PORT}}
+      url=${url//\$\{IMAGE\}/${IMAGE}}
       
       local METHOD=$(config_get "$APP" DOKKU_DEPLOY_WEBHOOK_METHOD)
       dokku_log_info1 "Invoking webhook url $url"
