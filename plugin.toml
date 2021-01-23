@@ -1,5 +1,5 @@
 [plugin]
 description = "Invokes a remote URL immediately after each successful container deployment"
-version = "0.1.9"
+version = "0.2.0"
 website_url = "https://github.com/IdeaSynthesis/dokku-deploy-webhook"
 [plugin.config]
