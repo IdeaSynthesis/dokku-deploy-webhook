@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_AVAILABLE_PATH/ports/functions"
+
+deploy-webhook-post-deploy() {
+  declare APP="$1"
+  declare PORT="$2"
+  declare IP="$3"
+
+  invoke_deploy_webhook "$APP" "$IP" "$PORT"
+}
+
+deploy-webhook-post-deploy "$@"
