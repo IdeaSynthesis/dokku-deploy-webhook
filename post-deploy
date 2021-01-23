@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
-source "$PLUGIN_AVAILABLE_PATH/ports/functions"
+source "$PLUGIN_AVAILABLE_PATH/deploy-webhook/functions"
 
 deploy-webhook-post-deploy() {
   declare APP="$1"
