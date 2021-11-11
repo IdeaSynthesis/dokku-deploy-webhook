@@ -14,20 +14,37 @@ invoke_deploy_webhook() {
   local IMAGE="$4"
 
   local WEBHOOK_URL=$(config_get "$APP" DOKKU_DEPLOY_WEBHOOK)
-
-  if [[ "" != "$WEBHOOK_URL" ]] ; then
-      # replace the fields
-      local url=${WEBHOOK_URL//\$\{IP_ADDRESS\}/${IP}}:
-      url=${url//\$\{APP\}/${APP}}
-      url=${url//\$\{PORT\}/${PORT}}
-      url=${url//\$\{IMAGE\}/${IMAGE}}
+ 
+	if [[ "" != "$WEBHOOK_URL" ]] ; then
+			# replace the fields
+			local DOKKU_APP_LISTENERS="$(plugn trigger network-get-listeners "$APP" "web" | xargs)"
+			
+      # wipe it
+      #dokku_log_warn "LISTENERS: $DOKKU_APP_LISTENERS"
       
+      local url
+      local start="true"
       local METHOD=$(config_get "$APP" DOKKU_DEPLOY_WEBHOOK_METHOD)
-      dokku_log_info1 "Invoking webhook url $url"
-      if [[ "POST" == "$METHOD" ]] ; then
-          dokku_log_info1 $(curl -s -q -m 5 "$url" -X "POST" -H "Content-Type: application/x-www-form-urlencoded" -d "APP=$APP" -d "IP=$IP" -d "PORT=$PORT")          
-      else
-          dokku_log_info1 $(curl -s -q -m 5 "$url")          
-      fi
-  fi  
+      local index=0
+      for str in ${DOKKU_APP_LISTENERS// / } ; do
+          ip=$(echo $str | cut -f1 -d:)
+          index=$((index+1))
+          url=${WEBHOOK_URL//\$\{IP_ADDRESS\}/${ip}}
+          url=${url//\$\{APP\}/${APP}}
+          url=${url//\$\{PORT\}/${PORT}}
+          url=${url//\$\{IMAGE\}/${IMAGE}}
+          url="${url}&index=$index"
+					
+          if [[ "true" == "$start" ]] ; then
+              start="false"
+              url="${url}&initial=true"
+          fi
+          dokku_log_info1 "Invoking webhook url $url"
+          if [[ "POST" == "$METHOD" ]] ; then
+              dokku_log_info1 $(curl -s -q -m 5 "$url" -X "POST" -H "Content-Type: application/x-www-form-urlencoded" -d "APP=$APP" -d "IP=$IP" -d "PORT=$PORT")
+          else
+              dokku_log_info1 $(curl -s -q -m 5 "$url")
+          fi
+      done
+  fi
 }

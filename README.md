@@ -30,7 +30,7 @@ Configure the deploy webhook behavior.
 Configure the deploy hook URL:
 
 ```
-$ dokku config:set --no-restart myapp DOKKU_DEPLOY_WEBHOOK=http://hostname.tld/?IP=${IP_ADDRESS}&APP=${APP}
+$ dokku config:set --no-restart myapp DOKKU_DEPLOY_WEBHOOK=http://hostname.tld/?IP=${IP_ADDRESS}&APP=${APP}&index=${index}&IMAGE=${IMAGE}&initial=true
 -----> Setting config vars
        DOKKU_DEPLOY_WEBHOOK: http://hostname.tld/?IP=${IP_ADDRESS}&APP=${APP} 
 
@@ -46,6 +46,15 @@ Variable                   | Default     | Description
 ## Design
 
 `dokku-deploy-webhook` was built to allow a container deployment to cleanly notify a load balancer on a different machine about changes to the local container IPs caused by restarts.
+
+For every container started with the ***web*** process type, the webhook will be invoked. Each invocation will be done with the following template parameters replaced in the URL:
+- **${APP}**: the app the container is for.
+- **${IP}**: the container's IP address that the load balancer can use to communicate with the container
+- **${PORT}**: the listening port that the load balancer can use to communicate with the container
+- **${IMAGE}**: the container image
+
+All request URLs will include an **index** request parameter: this is the container index and can be used by the webhook receiver to differentiate between containers.
+The very first request will include the **initial** request parameter, with the value set to ***true***: this can be used to clear the load balancers state.
 
 ## License
 
